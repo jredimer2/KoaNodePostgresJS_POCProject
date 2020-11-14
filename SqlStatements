@@ -1,0 +1,10 @@
+DROP TABLE messages;
+
+CREATE TABLE messages (
+    id     serial,
+    userid1    integer,
+    userid2    integer,
+    msg         text
+);
+
+INSERT INTO messages (userid1, userid2, msg) VALUES (1,2,'test 123');
