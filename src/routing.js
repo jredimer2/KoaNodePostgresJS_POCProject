@@ -48,7 +48,7 @@ router.get('/user/:id', async ctx => {
 router.post('/users', async ctx => { 
     ctx.status = 200
     console.log(ctx.request.body)
-    WriteToDatabase(ctx.request.body)
+    WriteLog(ctx.request.body)
     
 }
 )
