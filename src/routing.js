@@ -1,7 +1,9 @@
+const { JsonWebTokenError } = require('jsonwebtoken');
 const Router = require('koa-router')
 const logger = require('logger')
 const outfile = 'C:/Logs/outfile.txt'
 const { Pool } = require('pg');
+var jwt = require('jsonwebtoken')
 
 const router = Router()
 
@@ -49,9 +51,34 @@ router.get('/users', async ctx => {
 
 router.get('/user/:id', async ctx => {
     ctx.status = 200
-    console.log("User Id = " + ctx.params.id)
+    ctx.body = {
+        userid: ctx.params.id
+    }
+    
 }
 )
+
+router.post('/posts', async ctx => {
+    ctx.body = {
+        message: 'Protected POST route'
+    }
+})
+
+router.post('/login', async ctx =>  {
+    // Mock user
+    const user = {
+        id: 1,
+        username: 'joe',
+        email: 'joe@gmail.com'
+    }
+
+    // Question: somehow ctx.body is not being sent from within this callback.
+    jwt.sign({user: user}, 'secretkey', (err, token) => {
+        ctx.body = {
+            token: token
+        }
+    })
+})
 
 router.post('/users', async ctx => {
     ctx.status = 200
