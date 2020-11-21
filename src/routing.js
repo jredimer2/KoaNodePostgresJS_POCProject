@@ -54,17 +54,25 @@ router.get('/user/:id', async ctx => {
     ctx.body = {
         userid: ctx.params.id
     }
-    
+
 }
 )
 
-router.post('/posts', async ctx => {
-    ctx.body = {
-        message: 'Protected POST route'
-    }
+router.post('/posts', verifyToken, async ctx => {
+
+    jwt.verify(ctx.token, 'secretKey', (err, authData) => {
+        if (err) {
+            ctx.status = 403
+        } else {
+            ctx.body = {
+                message: 'Post created',
+                authData: authData
+            }
+        }
+    })
 })
 
-router.post('/login', async ctx =>  {
+router.post('/login', async ctx => {
     // Mock user
     const user = {
         id: 1,
@@ -72,13 +80,20 @@ router.post('/login', async ctx =>  {
         email: 'joe@gmail.com'
     }
 
-    // Question: somehow ctx.body is not being sent from within this callback.
-    jwt.sign({user: user}, 'secretkey', (err, token) => {
+    let token
+    try {
+        token = jwt.sign({ user: user }, 'secretKey')
+        ctx.status = 200
         ctx.body = {
             token: token
         }
-    })
+        console.log(token)
+    } catch (error) {
+        ctx.status = 403
+        console.error(error);
+    }
 })
+
 
 router.post('/users', async ctx => {
     ctx.status = 200
@@ -92,5 +107,23 @@ router.get('/dbtest', async ctx => {
     ctx.body = users
 }
 )
+
+// FORMAT OF TOKEN
+// Authorization: Bearer <access_token>
+async function verifyToken(ctx, next) {
+
+    const bearerHeader = ctx.req.headers['authorization']
+ 
+    if (typeof bearerHeader !== 'undefined') {
+        // Split at the space
+        const bearer = bearerHeader.split(' ')
+        const bearerToken = bearer[1]
+        ctx.token = bearerToken
+        next()
+    } else {
+        //Forbidden
+        ctx.status = 403
+    }
+}
 
 module.exports = router
