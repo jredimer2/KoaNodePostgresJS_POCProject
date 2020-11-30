@@ -1,61 +1,17 @@
 const { JsonWebTokenError } = require('jsonwebtoken');
 const Router = require('koa-router')
-const logger = require('logger')
-const outfile = 'C:/Logs/outfile.txt'
 const { Pool } = require('pg');
 var jwt = require('jsonwebtoken')
 
 const router = Router()
-
-//pool.on('error', err => {
-//    console.log('Pool Error: ', err);
-//});
-
-//async function WriteToDatabase(sql_json) {
-//    try {
-//        const response = await pool.query(sql_json.query);
-//    } catch (err) {
-//        console.log('Query Error:', sql_str, err);
-//    }
-//}
+const users = require('api/users/routes')
+const merchants = require('api/merchants/routes')
 
 
-let users = [
-    {
-        "id": 1,
-        "firstname": "John",
-        "lastname": "Doe"
-
-    },
-    {
-        "id": 2,
-        "firstname": "Jane",
-        "lastname": "Doef"
-    }
-]
-
-
-async function WriteLog(msg) {
-    await logger(outfile, msg);
-}
-
-router.get('/', async ctx => { ctx.status = 200 }
+router.use('/users', users.routes()
 )
 
-router.get('/users', async ctx => {
-    ctx.status = 200
-    console.log("Displaying all users")
-    return { user: 'user1', firstname: 'John', lastname: 'Doe' }
-}
-)
-
-router.get('/user/:id', async ctx => {
-    ctx.status = 200
-    ctx.body = {
-        userid: ctx.params.id
-    }
-
-}
+router.use('/merchants', merchants.routes()
 )
 
 router.post('/posts', verifyToken, async ctx => {

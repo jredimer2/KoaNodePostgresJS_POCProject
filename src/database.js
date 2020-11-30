@@ -10,11 +10,12 @@ exports.start = async function () {
 
     this.pool = new Pool({ user, host, database, password, host })
 }
+ 
 
 exports.close = async function () {
     await this.pool.end()
 }
 
 exports.query = async function (d, data) {
-    await this.pool.query(d, data)
+    return await this.pool.query(d, data)
 }
