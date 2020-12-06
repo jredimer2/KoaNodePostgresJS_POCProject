@@ -1,7 +1,8 @@
 const database = require('database')
 
 exports.getByMerchId = async function (merch_id) {
-    return database.query(`SELECT firstname, lastname, email, user_id, merchant_id
+    // there's no user_id field in the users table, hence updated it to id
+    return database.query(`SELECT firstname, lastname, email, id, merchant_id
     FROM users WHERE merchant_id=$1`, [merch_id])
 }
 
