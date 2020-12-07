@@ -8,32 +8,40 @@ const users = require('api/users/routes')
 const merchants = require('api/merchants/routes')
 
 
-router.use('/users', users.routes()
-)
+// protect your route with verifyToken
+router.use('/users', verifyToken, users.routes())
 
 router.use('/merchants', merchants.routes()
 )
 
 router.post('/posts', verifyToken, async ctx => {
 
-    jwt.verify(ctx.token, 'secretKey', (err, authData) => {
-        if (err) {
-            ctx.status = 403
-        } else {
-            ctx.body = {
-                message: 'Post created',
-                authData: authData
-            }
-        }
-    })
+    // jwt.verify(ctx.token, 'secretKey', (err, authData) => {
+    //     if (err) {
+    //         ctx.status = 403
+    //     } else {
+    //         ctx.body = {
+    //             message: 'Post created',
+    //             authData: authData
+    //         }
+    //     }
+    // })
+
+
+    ctx.body = {
+        message: 'Post created',
+        authData: ctx.user
+    }
 })
 
 router.post('/login', async ctx => {
     // Mock user
+    // adding merch_id with the token
     const user = {
         id: 1,
         username: 'joe',
-        email: 'joe@gmail.com'
+        email: 'joe@gmail.com',
+        merch_id: '0c6f48b7-7d4b-44ca-bf94-588c588ee30a'
     }
 
     let token
@@ -75,7 +83,16 @@ async function verifyToken(ctx, next) {
         const bearer = bearerHeader.split(' ')
         const bearerToken = bearer[1]
         ctx.token = bearerToken
-        next()
+        
+        try {
+            // add the decoded token to the ctx object so that we can access it later
+            let decoded = jwt.verify(ctx.token, 'secretKey');
+            ctx.user = decoded.user;
+            await next();
+        } catch(error) {
+            console.error(error);
+            ctx.status = 403
+        }
     } else {
         //Forbidden
         ctx.status = 403
