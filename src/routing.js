@@ -47,7 +47,8 @@ router.post('/login', async ctx => {
     let token
     try {
         token = jwt.sign({ user: user }, 'secretKey')
-        ctx.status = 200
+        ctx.status = 200,
+        ctx.header = {"Access-Control-Allow-Origin": "*"},
         ctx.body = {
             token: token
         }

@@ -1,4 +1,5 @@
 const Koa = require('koa')
+const cors = require('koa-cors')
 const router = require('routing')
 const ResponseTime = require('koa-response-time')
 const Morgan = require('koa-morgan')
@@ -8,6 +9,7 @@ const dbase = require('database')
 const app = new Koa()
 const port = 3001
 
+app.use(cors())
 app.use(ResponseTime())
 app.use(Morgan('combined'))
 app.use(bodyParser({ enableTypes: ['json', 'text'] }))
