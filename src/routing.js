@@ -88,7 +88,6 @@ async function verifyToken(ctx, next) {
         try {
             // add the decoded token to the ctx object so that we can access it later
             let decoded = jwt.verify(ctx.token, 'secretKey');
-
             console.log('>>>>>>>>>>>>>> DBSERVER.routes : decoded.user = ', decoded.user)
             ctx.user = decoded.user;
             await next();
