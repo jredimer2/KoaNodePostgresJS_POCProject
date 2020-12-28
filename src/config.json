@@ -1,8 +1,8 @@
 {
     "PGHOST" : "localhost",
-    "PGDATABASE" : "testdb",
+    "PGDATABASE" : "stockyphi",
     "PGPORT" : 5432,
     "PGUSER" : "postgres",
-    "PGPASSWORD" : "admin2;"
+    "PGPASSWORD" : "rajkumar"
 }
 
