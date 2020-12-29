@@ -9,7 +9,7 @@ const dbase = require('database')
 const app = new Koa()
 const port = 3001
 
-app.use(cors())
+app.use(cors({origin: '*', credentials: false}))
 app.use(ResponseTime())
 app.use(Morgan('combined'))
 app.use(bodyParser({ enableTypes: ['json', 'text'] }))
