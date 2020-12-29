@@ -6,6 +6,7 @@ var jwt = require('jsonwebtoken')
 const router = Router()
 const users = require('api/users/routes')
 const merchants = require('api/merchants/routes')
+const { createDiscountCode, createPriceRule } = require('./api/shopify/discount');
 
 
 // protect your route with verifyToken
@@ -72,6 +73,51 @@ router.get('/dbtest', async ctx => {
     ctx.body = users
 }
 )
+
+
+router.post('/price-rule', verifyToken, async ctx => {
+
+    const user = ctx.user || {};
+    const merch_id = user.merch_id;
+    const price_rule_data = ctx.request.body;
+
+    // find the record with matching merch_id and get the access token and shop from the db row
+    const shop = "example.myshopify.com";
+    const access_token = "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";
+
+    let priceRule = await createPriceRule({shop, access_token, price_rule_data: price_rule_data});
+
+    ctx.body = {
+        message: 'Price Rule created',
+        price_rule: priceRule.price_rule
+    }
+});
+
+
+router.post('/discount', verifyToken, async ctx => {
+
+    const user = ctx.user || {};
+    const merch_id = user.merch_id;
+    const { code, price_rule_id } = ctx.request.body;
+
+    if(!(code && price_rule_id)) {
+        ctx.body = { 
+            message: 'code and price_rule_id are required'
+        }
+        return;
+    }
+
+    // find the record with matching merch_id and get the access token and shop from the db row
+    const shop = "example.myshopify.com";
+    const access_token = "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";
+
+    let discount = await createDiscountCode({shop, access_token, price_rule_id: price_rule_id, code: code});
+
+    ctx.body = {
+        message: 'Discount created',
+        discount: discount.discount_code
+    }
+});
 
 // FORMAT OF TOKEN
 // Authorization: Bearer <access_token>
