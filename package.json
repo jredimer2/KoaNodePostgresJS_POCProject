@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "cross-env": "^7.0.2",
     "enforce-node-path": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
