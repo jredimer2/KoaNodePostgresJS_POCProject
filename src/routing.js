@@ -85,7 +85,7 @@ router.post('/price-rule', verifyToken, async ctx => {
 
     // find the record with matching merch_id and get the access token and shop from the db row
     const shop = "jredstore1.myshopify.com";
-    const access_token = "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";
+    const access_token = "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";
     
     console.log('/price-rule   TP-2')
 
@@ -115,7 +115,7 @@ router.post('/discount', verifyToken, async ctx => {
 
     // find the record with matching merch_id and get the access token and shop from the db row
     const shop = "jredstore1.myshopify.com";
-    const access_token = "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";
+    const access_token = "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";
 
     let discount = await createDiscountCode({shop, access_token, price_rule_id: price_rule_id, code: code});
 
@@ -145,11 +145,11 @@ async function verifyToken(ctx, next) {
             await next();
         } catch(error) {
             console.error(error);
-            ctx.status = 403
+            ctx.status = 400
         }
     } else {
         //Forbidden
-        ctx.status = 403
+        ctx.status = 400
     }
 }
 
