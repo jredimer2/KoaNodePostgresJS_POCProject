@@ -9,7 +9,7 @@ let createPriceRule = async ({shop, access_token, price_rule_data={}}) => {
             console.log('>>>>>>> createPriceRule   TP-1   access_token =', access_token)
             var data = {
                 "price_rule": {
-                  "title": "SUMMERSALE10OFF",
+                  "title": "NEWPR1",
                   "target_type": "line_item",
                   "target_selection": "all",
                   "allocation_method": "across",
