@@ -5,9 +5,11 @@ const axios = require('axios');
 let createPriceRule = async ({shop, access_token, price_rule_data={}}) => {
     return new Promise( async (resolve, reject)  => {
         try {
+
+            console.log('>>>>>>> createPriceRule   TP-1   access_token =', access_token)
             var data = {
                 "price_rule": {
-                  "title": "SUMMERSALE10OFF",
+                  "title": "NEWPR1",
                   "target_type": "line_item",
                   "target_selection": "all",
                   "allocation_method": "across",
@@ -19,6 +21,7 @@ let createPriceRule = async ({shop, access_token, price_rule_data={}}) => {
                 }
             };
     
+            console.log('>>>>>>> createPriceRule   TP-2')
             var config = {
                 method: 'post',
                 url: `https://${shop}/admin/api/2020-10/price_rules.json`,
@@ -29,10 +32,15 @@ let createPriceRule = async ({shop, access_token, price_rule_data={}}) => {
                 data: data
             };
     
+            console.log('>>>>>>> createPriceRule   TP-3')
             let newPriceRule = await axios(config);
+            console.log('>>>>>>> createPriceRule   TP-4')
             newPriceRule = newPriceRule.data;
+            console.log('>>>>>>> createPriceRule   TP-5')
             console.log({newPriceRule});
+            console.log('>>>>>>> createPriceRule   TP-6')
             resolve(newPriceRule);
+            console.log('>>>>>>> createPriceRule   TP-7')
         } catch (error) {
             console.error(error);
             reject(error);

@@ -10,7 +10,6 @@ router.get('/', async ctx => {
 
     // get merch_id
     if ((ctx.user.merch_id != undefined) && (ctx.request.query.merch_id == ctx.user.merch_id)) {
-        console.log("merch_id != undefined");
         if (ctx.request.query.user_id == undefined) {
             const associates = await controller.getByMerchId(ctx.request.query.merch_id)
             console.log(associates.rows)
