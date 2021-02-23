@@ -7,10 +7,11 @@ const router = Router()
 const users = require('api/users/routes')
 const merchants = require('api/merchants/routes')
 const { createDiscountCode, createPriceRule } = require('./api/shopify/discount');
-const { getCollectionsList} = require('./api/shopify/product');
+const { getCollectionsList } = require('./api/shopify/product');
+const { appUninstalled, registerShopUninstallWebhook } = require('./api/shopify/webhooks');
 const axios = require('axios');
 
-const ACCESS_TOKEN = "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";
+const ACCESS_TOKEN = "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";
 
 // protect your route with verifyToken
 router.use('/users', verifyToken, users.routes())
@@ -52,11 +53,11 @@ router.post('/login', async ctx => {
     try {
         token = jwt.sign({ user: user }, 'secretKey')
         ctx.status = 200,
-        ctx.header = {"Access-Control-Allow-Origin": "*"},
-        ctx.body = {
-            token: token
-        }
-        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<< /login Returned Token =',token)
+            ctx.header = { "Access-Control-Allow-Origin": "*" },
+            ctx.body = {
+                token: token
+            }
+        console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<< /login Returned Token =', token)
     } catch (error) {
         ctx.status = 403
         console.error(error);
@@ -113,7 +114,7 @@ router.post('/price-rule', verifyToken, async ctx => {
     const shop = "jredstore1.myshopify.com";
     //const access_token = "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";
     const access_token = ACCESS_TOKEN;
-        
+
     console.log('/price-rule   TP-2')
 
     let priceRule = await createPriceRule({shop, access_token, price_rule_data: price_rule_data});
@@ -133,8 +134,8 @@ router.post('/discount', verifyToken, async ctx => {
     const merch_id = user.merch_id;
     const { code, price_rule_id } = ctx.request.body;
 
-    if(!(code && price_rule_id)) {
-        ctx.body = { 
+    if (!(code && price_rule_id)) {
+        ctx.body = {
             message: 'code and price_rule_id are required'
         }
         return;
@@ -144,7 +145,7 @@ router.post('/discount', verifyToken, async ctx => {
     const shop = "jredstore1.myshopify.com";
     const access_token = ACCESS_TOKEN;
 
-    let discount = await createDiscountCode({shop, access_token, price_rule_id: price_rule_id, code: code});
+    let discount = await createDiscountCode({ shop, access_token, price_rule_id: price_rule_id, code: code });
 
     ctx.body = {
         message: 'Discount created',
@@ -162,7 +163,7 @@ router.get('/collections', async ctx => {
     const shop = "jredstore1.myshopify.com";
     const access_token = ACCESS_TOKEN;
 
-    let collections = await getCollectionsList({shop, access_token});
+    let collections = await getCollectionsList({ shop, access_token });
 
     ctx.body = collections
     /*
@@ -174,26 +175,53 @@ router.get('/collections', async ctx => {
 }
 )
 
+router.post('/webhooks/app-uninstalled', async ctx => {
+
+    let { shop } = ctx.request.body;
+
+    // find the record with matching merch_id and get the access token and shop from the db row
+    // @todo: get the access_token from the DB
+    const access_token = ACCESS_TOKEN;
+
+    let resp = await appUninstalled({ shop, access_token });
+
+    ctx.body = resp;
+});
+
+
+
+router.post('/webhooks/register', async ctx => {
+
+    let { shop, access_token } = ctx.request.body;
+
+    // this is your next js app's address
+    let address = 'https://something.ngrok.io/webhooks/app-uninstalled';
+
+    let resp = await registerShopUninstallWebhook({ shop, access_token, address });
+
+    ctx.body = resp;
+});
+
 
 // FORMAT OF TOKEN
 // Authorization: Bearer <access_token>
 async function verifyToken(ctx, next) {
 
     const bearerHeader = ctx.req.headers['authorization']
- 
+
     if (typeof bearerHeader !== 'undefined') {
         // Split at the space
         const bearer = bearerHeader.split(' ')
         const bearerToken = bearer[1]
         ctx.token = bearerToken
-        
+
         try {
             // add the decoded token to the ctx object so that we can access it later
             let decoded = jwt.verify(ctx.token, 'secretKey');
             console.log('>>>>>>>>>>>>>> verifyToken successful. decoded.user = ', decoded.user)
             ctx.user = decoded.user;
             await next();
-        } catch(error) {
+        } catch (error) {
             console.error(error);
             ctx.status = 400
         }
